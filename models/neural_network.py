@@ -604,7 +604,12 @@ class NeuralNetworkBuilder(object):
             spec_layer_params.thresholdedReLU.alpha = float(theta)
   
         elif non_linearity == 'LINEAR':
-            spec_layer_params.linear.alpha = 1.0
+            if params is None:
+                alpha, beta = (1.0, 0.0)
+            else:
+                alpha, beta = params[0], params[1]
+            spec_layer_params.linear.alpha = alpha
+            spec_layer_params.linear.beta = beta
         else:
             raise TypeError("Unknown activation type %s." %(non_linearity))
 
