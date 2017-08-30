@@ -1,5 +1,6 @@
 from . import _utils
 import keras
+from ...keras_extra import layers as extra_keras
 import numpy as np
 
 
@@ -29,6 +30,8 @@ def _get_activation_name_from_keras_layer(keras_layer):
         non_linearity = 'ELU'
     elif isinstance(keras_layer, keras.layers.advanced_activations.ThresholdedReLU):
         non_linearity = 'THRESHOLDEDRELU'
+    elif isinstance(keras_layer, extra_keras.LinearActivation):
+        non_linearity = 'LINEAR'
     else:
         import six
         if six.PY2:
@@ -209,6 +212,11 @@ def convert_activation(builder, layer, input_names, output_names, keras_layer):
         params = keras_layer.alpha
     elif non_linearity == 'THRESHOLDEDRELU':
         params = keras_layer.theta
+    elif non_linearity == "LINEAR":
+        if hasattr(keras_layer, 'alpha') and hasattr(keras_layer, 'beta'):
+            params = [keras_layer.alpha, keras_layer.beta]
+        elif hasattr(keras_layer, 'alpha'):
+            params = keras_layer.alpha
     else:
         pass # do nothing to parameters
 

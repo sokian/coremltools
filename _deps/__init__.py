@@ -7,6 +7,7 @@
 List of all external dependancies for this package. Imported as
 optional includes
 """
+from __future__ import absolute_import
 from distutils.version import StrictVersion as _StrictVersion
 import logging as _logging
 import re as _re

@@ -22,6 +22,8 @@ format. In particular, it can be used to:
 For more information: http://developer.apple.com/documentation/coreml
 """
 
+from __future__ import absolute_import
+
 # File format versions
 SPECIFICATION_VERSION = 1
 

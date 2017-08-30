@@ -12,21 +12,22 @@ from ..proto import NeuralNetwork_pb2 as _NeuralNetwork_pb2
 from ..proto import FeatureTypes_pb2 as _FeatureTypes_pb2
 from ._interface_management import set_transform_interface_params
 from . import datatypes
+from builtins import range
 
 
 def _set_recurrent_activation(param, activation):
     if activation == 'SIGMOID':
-        param.sigmoid.MergeFromString('')
+        param.sigmoid.MergeFromString(b'')
     elif activation == 'TANH':
-        param.tanh.MergeFromString('')
+        param.tanh.MergeFromString(b'')
     elif activation == 'LINEAR':
-        param.linear.MergeFromString('')
+        param.linear.MergeFromString(b'')
     elif activation == 'SIGMOID_HARD':
-        param.sigmoidHard.MergeFromString('')
+        param.sigmoidHard.MergeFromString(b'')
     elif activation == 'SCALED_TANH':
-        param.scaledTanh.MergeFromString('')
+        param.scaledTanh.MergeFromString(b'')
     elif activation == 'RELU':
-        param.ReLU.MergeFromString('')
+        param.ReLU.MergeFromString(b'')
     else:
         raise TypeError("Unsupported activation type with Recurrrent layer: %s." % activation)
 
@@ -232,7 +233,7 @@ class NeuralNetworkBuilder(object):
             raise ValueError(
                 "Model should have atleast one output (the probabilities) to automatically make it a classifier.")
         probOutput = spec.description.output[0]
-        probOutput.type.dictionaryType.MergeFromString('')
+        probOutput.type.dictionaryType.MergeFromString(b'')
         if len(class_labels) == 0:
             return
         class_type = type(class_labels[0])
@@ -246,14 +247,14 @@ class NeuralNetworkBuilder(object):
         classLabel.name = predicted_feature_name
         if class_type == int:
             nn_spec.ClearField('int64ClassLabels')
-            probOutput.type.dictionaryType.int64KeyType.MergeFromString('')
-            classLabel.type.int64Type.MergeFromString('')
+            probOutput.type.dictionaryType.int64KeyType.MergeFromString(b'')
+            classLabel.type.int64Type.MergeFromString(b'')
             for c in class_labels:
                 nn_spec.int64ClassLabels.vector.append(c)
         else:
             nn_spec.ClearField('stringClassLabels')
-            probOutput.type.dictionaryType.stringKeyType.MergeFromString('')
-            classLabel.type.stringType.MergeFromString('')
+            probOutput.type.dictionaryType.stringKeyType.MergeFromString(b'')
+            classLabel.type.stringType.MergeFromString(b'')
             for c in class_labels:
                 nn_spec.stringClassLabels.vector.append(c)
 
@@ -446,7 +447,7 @@ class NeuralNetworkBuilder(object):
         spec_layer.name = name
         spec_layer.input.append(input_name)
         spec_layer.output.append(output_name)
-        spec_layer_params = spec_layer.softmax.MergeFromString('')
+        spec_layer_params = spec_layer.softmax.MergeFromString(b'')
 
     def add_activation(self, name, non_linearity, input_name, output_name,
         params=None):
@@ -543,16 +544,16 @@ class NeuralNetworkBuilder(object):
 
         # Fill in the parameters
         if non_linearity == 'RELU':
-            spec_layer_params.ReLU.MergeFromString('')
+            spec_layer_params.ReLU.MergeFromString(b'')
   
         elif non_linearity == 'SIGMOID':
-            spec_layer_params.sigmoid.MergeFromString('')
+            spec_layer_params.sigmoid.MergeFromString(b'')
 
         elif non_linearity == 'TANH':
-            spec_layer_params.tanh.MergeFromString('')
+            spec_layer_params.tanh.MergeFromString(b'')
 
         elif non_linearity == 'SCALED_TANH':
-            spec_layer_params.scaledTanh.MergeFromString('')
+            spec_layer_params.scaledTanh.MergeFromString(b'')
             if params is None:
                 alpha, beta = (0.0, 0.0)
             else:
@@ -561,10 +562,10 @@ class NeuralNetworkBuilder(object):
             spec_layer_params.scaledTanh.beta = beta
 
         elif non_linearity == 'SOFTPLUS':
-            spec_layer_params.softplus.MergeFromString('')
+            spec_layer_params.softplus.MergeFromString(b'')
 
         elif non_linearity == 'SOFTSIGN':
-            spec_layer_params.softsign.MergeFromString('')
+            spec_layer_params.softsign.MergeFromString(b'')
 
         elif non_linearity == 'SIGMOID_HARD':
             if params is None:
@@ -604,7 +605,13 @@ class NeuralNetworkBuilder(object):
             spec_layer_params.thresholdedReLU.alpha = float(theta)
   
         elif non_linearity == 'LINEAR':
-            spec_layer_params.linear.alpha = 1.0
+            if params is None:
+                spec_layer_params.linear.alpha = 1.0
+            elif isinstance(params, list):
+                spec_layer_params.linear.alpha = float(params[0])
+                spec_layer_params.linear.beta = float(params[1])
+            else:
+                spec_layer_params.linear.alpha = float(params)
         else:
             raise TypeError("Unknown activation type %s." %(non_linearity))
 
@@ -656,11 +663,11 @@ class NeuralNetworkBuilder(object):
         elif mode == 'SEQUENCE_CONCAT':
             spec_layer.concat.sequenceConcat = True
         elif mode == 'ADD':
-            spec_layer.add.MergeFromString('')
+            spec_layer.add.MergeFromString(b'')
             if alpha:
                 spec_layer.add.alpha = alpha
         elif mode == 'MULTIPLY':
-            spec_layer.multiply.MergeFromString('')
+            spec_layer.multiply.MergeFromString(b'')
             if alpha:
                 spec_layer.add.alpha = alpha
         elif mode == 'COS':
@@ -668,9 +675,9 @@ class NeuralNetworkBuilder(object):
         elif mode == 'DOT':
             spec_layer.dot.cosineSimilarity = False
         elif mode == 'MAX':
-            spec_layer.max.MergeFromString('')
+            spec_layer.max.MergeFromString(b'')
         elif mode == 'AVE':
-            spec_layer.average.MergeFromString('')
+            spec_layer.average.MergeFromString(b'')
         else:
             raise ValueError("Unspported elementwise mode %s" % mode)
 
@@ -875,7 +882,7 @@ class NeuralNetworkBuilder(object):
         spec_layer.name = name
         spec_layer.input.append(input_name)
         spec_layer.output.append(output_name)
-        spec_layer.convolution.MergeFromString('') # hack to set empty message
+        spec_layer.convolution.MergeFromString(b'') # hack to set empty message
 
         # Set the layer params
         spec_layer_params = spec_layer.convolution
@@ -918,7 +925,7 @@ class NeuralNetworkBuilder(object):
         else:
             Wt = W.transpose((2,3,0,1))
             Wt = Wt.flatten()
-        for idx in xrange(output_channels * kernel_channels * height * width):
+        for idx in range(output_channels * kernel_channels * height * width):
             weights.floatValue.append(float(Wt[idx]))
 
         # Assign biases

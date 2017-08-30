@@ -11,6 +11,7 @@ from ..._deps import HAS_KERAS2_TF as _HAS_KERAS2_TF
 
 if _HAS_KERAS2_TF:
     import keras as _keras
+    from ...keras_extra import layers as extra_keras
     from . import _layers2
     from . import _topology2
     _KERAS_LAYER_REGISTRY  = {
@@ -63,7 +64,7 @@ if _HAS_KERAS2_TF:
         _keras.engine.topology.InputLayer:_layers2.default_skip,
         _keras.layers.core.Dropout:_layers2.default_skip,
         _keras.layers.wrappers.TimeDistributed:_layers2.default_skip,
-
+        extra_keras.LinearActivation: _layers2.convert_activation,
     }
 
     _KERAS_SKIP_LAYERS = [
